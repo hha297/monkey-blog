@@ -14,6 +14,7 @@ import SignInPage from 'pages/SignInPage';
 import { Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './contexts/auth-context';
 import SignUpPage from './pages/SignUpPage';
+import CategoryUpdate from 'module/category/CategoryUpdate';
 
 function App() {
     return (
@@ -32,6 +33,8 @@ function App() {
                         <Route path="/manage/add-post" element={<PostAddNew></PostAddNew>}></Route>
                         <Route path="/manage/category" element={<CategoryManage></CategoryManage>}></Route>
                         <Route path="/manage/add-category" element={<CategoryAddNew></CategoryAddNew>}></Route>
+                        <Route path="/manage/update-category" element={<CategoryUpdate></CategoryUpdate>}></Route>
+
                         <Route path="/manage/user" element={<UserManage></UserManage>}></Route>
                         <Route path="/manage/add-user" element={<UserAddNew></UserAddNew>}></Route>
                         <Route path="/profile" element={<UserProfile></UserProfile>}></Route>
