@@ -47,6 +47,7 @@ const UserTable = () => {
                 break;
         }
     };
+
     const renderLabelStatus = (status) => {
         switch (status) {
             case userStatus.ACTIVE:
