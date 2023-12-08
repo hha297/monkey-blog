@@ -27,7 +27,7 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { postStatus } from 'utils/constants';
 
-const POST_PER_PAGE = 1;
+const POST_PER_PAGE = 5;
 
 const PostManage = () => {
     const [postList, setPostList] = useState([]);
