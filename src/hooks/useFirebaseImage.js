@@ -21,14 +21,18 @@ export default function useFirebaseImage(
     const [image, setImage] = useState('');
     if (!setValue || !getValues) return;
     const handleUploadImage = (file) => {
-        if (userInfo?.role !== userRole.ADMIN) {
-            Swal.fire(
-                'Failed',
-                'You have no right to do this action',
-                'warning',
-            );
-            return;
-        }
+        // console.log(userInfo?.role);
+        // if (
+        //     !userInfo ||
+        //     userInfo?.role !== userRole.ADMIN
+        // ) {
+        //     Swal.fire(
+        //         'Failed',
+        //         'You have no right to do this action',
+        //         'warning',
+        //     );
+        //     return;
+        // }
         const storage = getStorage();
         const storageRef = ref(
             storage,

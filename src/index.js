@@ -20,7 +20,10 @@ root.render(
             <GlobalStyles></GlobalStyles>
             <BrowserRouter>
                 <App />
-                <ToastContainer></ToastContainer>
+                <ToastContainer
+                    autoClose={2500}
+                    pauseOnHover={false}
+                ></ToastContainer>
             </BrowserRouter>
         </ThemeProvider>
     </React.StrictMode>,
