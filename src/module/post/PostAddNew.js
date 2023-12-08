@@ -14,42 +14,83 @@ import { Field, FieldCheckboxes } from 'components/field';
 import { Dropdown } from 'components/dropdown';
 import { db } from 'firebase-app/firebase-config';
 import { Button } from 'components/button';
-import { addDoc, collection, getDocs, query, serverTimestamp, where } from 'firebase/firestore';
+import {
+    addDoc,
+    collection,
+    doc,
+    getDoc,
+    getDocs,
+    query,
+    serverTimestamp,
+    where,
+} from 'firebase/firestore';
 import DashboardHeading from 'module/dashboard/DashboardHeading';
 
 const PostAddNew = () => {
     const { userInfo } = useAuth();
-    const { control, watch, setValue, handleSubmit, getValues, reset } = useForm({
+    const {
+        control,
+        watch,
+        setValue,
+        handleSubmit,
+        getValues,
+        reset,
+    } = useForm({
         mode: 'onChange',
         defaultValues: {
             title: '',
             slug: '',
             status: 2,
-            categoryId: '',
-            feature: false,
+            hot: false,
             image: '',
+            category: {},
+            user: {},
         },
     });
     const watchStatus = watch('status');
-    const watchFeature = watch('feature');
-    const { image, handleResetUpload, progress, handleSelectImage, handleDeleteImage } = useFirebaseImage(
-        setValue,
-        getValues,
-    );
+    const watchHot = watch('hot');
+    const {
+        image,
+        handleResetUpload,
+        progress,
+        handleSelectImage,
+        handleDeleteImage,
+    } = useFirebaseImage(setValue, getValues);
     const [categories, setCategories] = useState([]);
-    const [selectCategory, setSelectCategory] = useState('');
+    const [selectCategory, setSelectCategory] =
+        useState('');
     const [loading, setLoading] = useState(false);
+    useEffect(() => {
+        async function fetchUserData() {
+            if (!userInfo.email) return;
+            const q = query(
+                collection(db, 'users'),
+                where('email', '==', userInfo.email),
+            );
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach((doc) => {
+                setValue('user', {
+                    id: doc.id,
+                    ...doc.data(),
+                });
+            });
+        }
+        fetchUserData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [userInfo.email]);
     const addPostHandler = async (values) => {
         setLoading(true);
         try {
             const cloneValues = { ...values };
-            cloneValues.slug = slugify(values.slug || values.title, { lower: true });
+            cloneValues.slug = slugify(
+                values.slug || values.title,
+                { lower: true },
+            );
             cloneValues.status = Number(values.status);
             const colRef = collection(db, 'posts');
             await addDoc(colRef, {
                 ...cloneValues,
                 image,
-                userId: userInfo.uid,
                 createdAt: serverTimestamp(),
             });
             toast.success('Create new post successfully!');
@@ -57,9 +98,10 @@ const PostAddNew = () => {
                 title: '',
                 slug: '',
                 status: 2,
-                categoryId: '',
-                feature: false,
+                category: {},
+                hot: false,
                 image: '',
+                user: {},
             });
             handleResetUpload();
             setSelectCategory({});
@@ -73,7 +115,10 @@ const PostAddNew = () => {
     useEffect(() => {
         async function getData() {
             const colRef = collection(db, 'categories');
-            const q = query(colRef, where('status', '==', 1));
+            const q = query(
+                colRef,
+                where('status', '==', 1),
+            );
             const querySnapshot = await getDocs(q);
             let result = [];
             querySnapshot.forEach((doc) => {
@@ -88,26 +133,43 @@ const PostAddNew = () => {
     }, []);
 
     useEffect(() => {
-        document.title = 'Monkey Blog - Add new post';
+        document.title = 'Monkey Blogging - Add new post';
     }, []);
 
-    const handleClickOption = (item) => {
-        setValue('categoryId', item.id);
+    const handleClickOption = async (item) => {
+        const colRef = doc(db, 'categories', item.id);
+        const docData = await getDoc(colRef);
+        setValue('category', {
+            id: docData.id,
+            ...docData.data(),
+        });
         setSelectCategory(item);
     };
 
     return (
         <>
-            <DashboardHeading title="Add post" desc="Add new post"></DashboardHeading>
+            <DashboardHeading
+                title="Add post"
+                desc="Add new post"
+            ></DashboardHeading>
             <form onSubmit={handleSubmit(addPostHandler)}>
                 <div className="form-layout">
                     <Field>
                         <Label>Title</Label>
-                        <Input control={control} placeholder="Enter your title" name="title" required></Input>
+                        <Input
+                            control={control}
+                            placeholder="Enter your title"
+                            name="title"
+                            required
+                        ></Input>
                     </Field>
                     <Field>
                         <Label>Slug</Label>
-                        <Input control={control} placeholder="Enter your slug" name="slug"></Input>
+                        <Input
+                            control={control}
+                            placeholder="Enter your slug"
+                            name="slug"
+                        ></Input>
                     </Field>
                 </div>
                 <div className="form-layout">
@@ -115,8 +177,10 @@ const PostAddNew = () => {
                         <Label>Image</Label>
                         <ImageUpload
                             onChange={handleSelectImage}
-                            handleDeleteImage={handleDeleteImage}
-                            className="h-[250px] border-solid border-2 border-[#1DC071]"
+                            handleDeleteImage={
+                                handleDeleteImage
+                            }
+                            className="h-[250px]"
                             progress={progress}
                             image={image}
                         ></ImageUpload>
@@ -127,15 +191,26 @@ const PostAddNew = () => {
                             <Dropdown.Select placeholder="Select the category"></Dropdown.Select>
                             <Dropdown.List>
                                 {categories.length > 0 &&
-                                    categories.map((item) => (
-                                        <Dropdown.Option key={item.id} onClick={() => handleClickOption(item)}>
-                                            {item.name}
-                                        </Dropdown.Option>
-                                    ))}
+                                    categories.map(
+                                        (item) => (
+                                            <Dropdown.Option
+                                                key={
+                                                    item.id
+                                                }
+                                                onClick={() =>
+                                                    handleClickOption(
+                                                        item,
+                                                    )
+                                                }
+                                            >
+                                                {item.name}
+                                            </Dropdown.Option>
+                                        ),
+                                    )}
                             </Dropdown.List>
                         </Dropdown>
                         {selectCategory?.name && (
-                            <span className="inline-block p-3 rounded-lg text-sm text-green-600 font-medium">
+                            <span className="inline-block p-3 text-sm font-medium text-green-600 rounded-lg bg-green-50">
                                 {selectCategory?.name}
                             </span>
                         )}
@@ -144,7 +219,12 @@ const PostAddNew = () => {
                 <div className="form-layout">
                     <Field>
                         <Label>Feature post</Label>
-                        <Toggle on={watchFeature === true} onClick={() => setValue('feature', !watchFeature)}></Toggle>
+                        <Toggle
+                            on={watchHot === true}
+                            onClick={() =>
+                                setValue('hot', !watchHot)
+                            }
+                        ></Toggle>
                     </Field>
                     <Field>
                         <Label>Status</Label>
@@ -152,7 +232,10 @@ const PostAddNew = () => {
                             <Radio
                                 name="status"
                                 control={control}
-                                checked={Number(watchStatus) === postStatus.APPROVED}
+                                checked={
+                                    Number(watchStatus) ===
+                                    postStatus.APPROVED
+                                }
                                 value={postStatus.APPROVED}
                             >
                                 Approved
@@ -160,7 +243,10 @@ const PostAddNew = () => {
                             <Radio
                                 name="status"
                                 control={control}
-                                checked={Number(watchStatus) === postStatus.PENDING}
+                                checked={
+                                    Number(watchStatus) ===
+                                    postStatus.PENDING
+                                }
                                 value={postStatus.PENDING}
                             >
                                 Pending
@@ -168,7 +254,10 @@ const PostAddNew = () => {
                             <Radio
                                 name="status"
                                 control={control}
-                                checked={Number(watchStatus) === postStatus.REJECTED}
+                                checked={
+                                    Number(watchStatus) ===
+                                    postStatus.REJECTED
+                                }
                                 value={postStatus.REJECTED}
                             >
                                 Reject
@@ -176,7 +265,12 @@ const PostAddNew = () => {
                         </FieldCheckboxes>
                     </Field>
                 </div>
-                <Button type="submit" className="mx-auto w-[250px]" isLoading={loading} disabled={loading}>
+                <Button
+                    type="submit"
+                    className="mx-auto w-[250px]"
+                    isLoading={loading}
+                    disabled={loading}
+                >
                     Add new post
                 </Button>
             </form>
