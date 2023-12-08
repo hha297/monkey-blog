@@ -129,6 +129,7 @@ const PostDetailsPage = () => {
     if (!slug) return <PageNotFound></PageNotFound>;
     if (!postInfo.title) return null;
     const { user } = postInfo;
+    console.log(postInfo);
     return (
         <PostDetailsPageStyles>
             <Layout>
@@ -145,7 +146,12 @@ const PostDetailsPage = () => {
                             <h1 className="post-heading">
                                 {postInfo.title}
                             </h1>
-                            <PostMeta></PostMeta>
+                            <PostMeta
+                                date={postInfo.createdAt}
+                                authorName={
+                                    postInfo.user.username
+                                }
+                            ></PostMeta>
                         </div>
                     </div>
                     <div className="post-content">

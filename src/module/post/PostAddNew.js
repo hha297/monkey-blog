@@ -25,9 +25,11 @@ import {
     where,
 } from 'firebase/firestore';
 import DashboardHeading from 'module/dashboard/DashboardHeading';
+import ReactQuill from 'react-quill';
 
 const PostAddNew = () => {
     const { userInfo } = useAuth();
+    const [content, setContent] = useState('');
     const {
         control,
         watch,
@@ -92,6 +94,7 @@ const PostAddNew = () => {
                 ...cloneValues,
                 image,
                 createdAt: serverTimestamp(),
+                content,
             });
             toast.success('Create new post successfully!');
             reset({
@@ -104,6 +107,7 @@ const PostAddNew = () => {
                 user: {},
             });
             handleResetUpload();
+            setContent('');
             setSelectCategory({});
         } catch (error) {
             setLoading(false);
@@ -214,6 +218,18 @@ const PostAddNew = () => {
                                 {selectCategory?.name}
                             </span>
                         )}
+                    </Field>
+                </div>
+                <div className="mb-10">
+                    <Field>
+                        <Label>Content</Label>
+                        <div className="w-full entry-content">
+                            <ReactQuill
+                                theme="snow"
+                                value={content}
+                                onChange={setContent}
+                            />
+                        </div>
                     </Field>
                 </div>
                 <div className="form-layout">
