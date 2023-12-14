@@ -26,7 +26,7 @@ const formatTimestamp = (timestamp) => {
     return timestamp
         ? new Date(
               timestamp.seconds * 1000,
-          ).toLocaleString()
+          ).toLocaleDateString()
         : '';
 };
 

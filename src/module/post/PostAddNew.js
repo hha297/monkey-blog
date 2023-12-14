@@ -92,6 +92,8 @@ const PostAddNew = () => {
             const colRef = collection(db, 'posts');
             await addDoc(colRef, {
                 ...cloneValues,
+                categoryId: cloneValues.category.id,
+                userId: cloneValues.users.id,
                 image,
                 createdAt: serverTimestamp(),
                 content,
@@ -111,6 +113,7 @@ const PostAddNew = () => {
             setSelectCategory({});
         } catch (error) {
             setLoading(false);
+            console.log(error);
         } finally {
             setLoading(false);
         }
