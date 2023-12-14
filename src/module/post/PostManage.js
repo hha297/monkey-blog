@@ -171,10 +171,6 @@ const PostManage = () => {
                 <tbody>
                     {postList.length > 0 &&
                         postList.map((post) => {
-                            console.log(
-                                'postList.map ~ post',
-                                post,
-                            );
                             const date = post?.createdAt
                                 ?.seconds
                                 ? new Date(
