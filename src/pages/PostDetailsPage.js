@@ -21,6 +21,7 @@ import {
 import styled from 'styled-components';
 import PageNotFound from './PageNotFound';
 import parse from 'html-react-parser';
+import AuthorBox from 'components/author/AuthorBox';
 const PostDetailsPageStyles = styled.div`
     padding-bottom: 100px;
     .post {
@@ -158,22 +159,10 @@ const PostDetailsPage = () => {
                         <div className="entry-content">
                             {parse(postInfo.content || '')}
                         </div>
-                        <div className="author">
-                            <div className="author-image">
-                                <img
-                                    src={user?.avatar}
-                                    alt=""
-                                />
-                            </div>
-                            <div className="author-content">
-                                <h3 className="author-name">
-                                    {user?.fullname}
-                                </h3>
-                                <p className="author-desc">
-                                    {user?.description}
-                                </p>
-                            </div>
-                        </div>
+
+                        <AuthorBox
+                            userId={user.id}
+                        ></AuthorBox>
                     </div>
                     <div className="post-related">
                         <Heading>
