@@ -28,6 +28,7 @@ import { toast } from 'react-toastify';
 import ImageUploader from 'quill-image-uploader';
 import axios from 'axios';
 import { imgdbAPI } from 'config/apiConfig';
+import slugify from 'slugify';
 Quill.register('modules/imageUploader', ImageUploader);
 
 const PostUpdate = () => {
@@ -122,8 +123,13 @@ const PostUpdate = () => {
     const updatePostHandler = async (values) => {
         if (!isValid) return;
         const docRef = doc(db, 'posts', postId);
+        values.status = Number(values.status);
+        values.slug = slugify(values.slug || values.title, {
+            lower: true,
+        });
         await updateDoc(docRef, {
             ...values,
+            image,
             content,
         });
         toast.success('Update post successfully!');
