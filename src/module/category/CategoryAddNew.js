@@ -3,23 +3,28 @@ import { Radio } from 'components/checkbox';
 import { Field, FieldCheckboxes } from 'components/field';
 import { Input } from 'components/input';
 import { Label } from 'components/label';
+import { useAuth } from 'contexts/auth-context';
 import { db } from 'firebase-app/firebase-config';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import {
+    addDoc,
+    collection,
+    serverTimestamp,
+} from 'firebase/firestore';
 import DashboardHeading from 'module/dashboard/DashboardHeading';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import slugify from 'slugify';
-import { categoryStatus } from 'utils/constants';
+import Swal from 'sweetalert2';
+import { categoryStatus, userRole } from 'utils/constants';
 
 const CategoryAddNew = () => {
     const {
         control,
-        setValue,
-        formState: { errors, isSubmitting, isValid },
         handleSubmit,
         watch,
         reset,
+        formState: { isValid, isSubmitting },
     } = useForm({
         mode: 'onChange',
         defaultValues: {
@@ -29,11 +34,24 @@ const CategoryAddNew = () => {
             createdAt: new Date(),
         },
     });
-
+    const { userInfo } = useAuth();
     const handleAddNewCategory = async (values) => {
         if (!isValid) return;
+        if (userInfo?.role !== userRole.ADMIN) {
+            Swal.fire(
+                'Failed',
+                'You have no right to do this action',
+                'warning',
+            );
+            return;
+        }
         const newValues = { ...values };
-        newValues.slug = slugify(newValues.name || newValues.slug, { lower: true });
+        newValues.slug = slugify(
+            newValues.name || newValues.slug,
+            {
+                lower: true,
+            },
+        );
         newValues.status = Number(newValues.status);
         const colRef = collection(db, 'categories');
         try {
@@ -41,7 +59,9 @@ const CategoryAddNew = () => {
                 ...newValues,
                 createdAt: serverTimestamp(),
             });
-            toast.success('Create new category successfully');
+            toast.success(
+                'Create new category successfully!',
+            );
         } catch (error) {
             toast.error(error.message);
         } finally {
@@ -53,20 +73,37 @@ const CategoryAddNew = () => {
             });
         }
     };
-
     const watchStatus = watch('status');
     return (
         <div>
-            <DashboardHeading title="New category" desc="Add new category"></DashboardHeading>
-            <form onSubmit={handleSubmit(handleAddNewCategory)}>
+            <DashboardHeading
+                title="New category"
+                desc="Add new category"
+            ></DashboardHeading>
+            <form
+                onSubmit={handleSubmit(
+                    handleAddNewCategory,
+                )}
+                autoComplete="off
+      "
+            >
                 <div className="form-layout">
                     <Field>
                         <Label>Name</Label>
-                        <Input control={control} name="name" placeholder="Enter your category name" required></Input>
+                        <Input
+                            control={control}
+                            name="name"
+                            placeholder="Enter your category name"
+                            required
+                        ></Input>
                     </Field>
                     <Field>
                         <Label>Slug</Label>
-                        <Input control={control} name="slug" placeholder="Enter your slug"></Input>
+                        <Input
+                            control={control}
+                            name="slug"
+                            placeholder="Enter your slug"
+                        ></Input>
                     </Field>
                 </div>
                 <div className="form-layout">
@@ -76,18 +113,28 @@ const CategoryAddNew = () => {
                             <Radio
                                 name="status"
                                 control={control}
-                                checked={Number(watchStatus) === categoryStatus.APPROVED}
-                                value={categoryStatus.APPROVED}
+                                checked={
+                                    Number(watchStatus) ===
+                                    categoryStatus.APPROVED
+                                }
+                                value={
+                                    categoryStatus.APPROVED
+                                }
                             >
                                 Approved
                             </Radio>
                             <Radio
                                 name="status"
                                 control={control}
-                                checked={Number(watchStatus) === categoryStatus.REJECTED}
-                                value={categoryStatus.REJECTED}
+                                checked={
+                                    Number(watchStatus) ===
+                                    categoryStatus.UNAPPROVED
+                                }
+                                value={
+                                    categoryStatus.UNAPPROVED
+                                }
                             >
-                                rejected
+                                Unapproved
                             </Radio>
                         </FieldCheckboxes>
                     </Field>
