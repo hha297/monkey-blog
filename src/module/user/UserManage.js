@@ -5,8 +5,13 @@ import UserTable from './UserTable';
 import { Button } from 'components/button';
 import { userRole } from 'utils/constants';
 const UserManage = () => {
-    // const { userInfo } = useAuth();
-    // if (userInfo.role !== userRole.ADMIN) return null;
+    const { userInfo } = useAuth();
+    if (userInfo.role !== userRole.ADMIN)
+        return (
+            <div className="text-2xl font-bold text-red-400 text-center">
+                You don't have right to access this page
+            </div>
+        );
     return (
         <div>
             <DashboardHeading

@@ -79,7 +79,7 @@ const PostNewestItem = ({ data }) => {
                         { lower: true },
                     )}
                     authorName={data?.user?.fullname}
-                    date={formatDate}
+                    date={data.createdAt}
                 ></PostMeta>
             </div>
         </PostNewestItemStyles>

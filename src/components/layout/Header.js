@@ -3,6 +3,7 @@ import { useAuth } from 'contexts/auth-context';
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
+import { userRole } from 'utils/constants';
 const menuLinks = [
     {
         url: '/',
@@ -83,19 +84,33 @@ const Header = () => {
             <div className="container">
                 <div className="header-main">
                     <NavLink to="/">
-                        <img srcSet="/logo192.png 2x" alt="monkey-blogging" className="logo192" />
+                        <img
+                            srcSet="/logo.png 2x"
+                            alt="monkey-blogging"
+                            className="logo192"
+                        />
                     </NavLink>
                     <ul className="menu">
                         {menuLinks.map((item) => (
-                            <li className="menu-item" key={item.title}>
-                                <NavLink to={item.url} className="menu-link">
+                            <li
+                                className="menu-item"
+                                key={item.title}
+                            >
+                                <NavLink
+                                    to={item.url}
+                                    className="menu-link"
+                                >
                                     {item.title}
                                 </NavLink>
                             </li>
                         ))}
                     </ul>
                     <div className="search">
-                        <input type="text" className="search-input" placeholder="Search posts..." />
+                        <input
+                            type="text"
+                            className="search-input"
+                            placeholder="Search posts..."
+                        />
                         <span className="search-icon">
                             <svg
                                 width="18"
@@ -128,14 +143,36 @@ const Header = () => {
                         </span>
                     </div>
                     {!userInfo ? (
-                        <Button type="button" height="56px" className="header-button" to="/sign-in">
+                        <Button
+                            type="button"
+                            height="56px"
+                            className="header-button"
+                            to="/sign-in"
+                        >
                             Login
                         </Button>
                     ) : (
                         <div className="header-auth">
-                            <Button type="button" height="56px" className="header-button" to="/dashboard">
-                                Dashboard
-                            </Button>
+                            {userInfo.role !==
+                            userRole.ADMIN ? (
+                                <Button
+                                    type="button"
+                                    height="56px"
+                                    className="header-button"
+                                    to="/sign-in"
+                                >
+                                    Logout
+                                </Button>
+                            ) : (
+                                <Button
+                                    type="button"
+                                    height="56px"
+                                    className="header-button"
+                                    to="/dashboard"
+                                >
+                                    Dashboard
+                                </Button>
+                            )}
                         </div>
                     )}
                 </div>

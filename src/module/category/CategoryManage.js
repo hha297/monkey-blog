@@ -125,6 +125,13 @@ const CategoryManage = () => {
     const handleInputFilter = debounce((e) => {
         setFilter(e.target.value);
     }, 500);
+
+    if (userInfo.role !== userRole.ADMIN)
+        return (
+            <div className="text-2xl font-bold text-red-400 text-center">
+                You don't have right to access this page
+            </div>
+        );
     return (
         <div>
             <DashboardHeading

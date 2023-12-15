@@ -54,7 +54,7 @@ const PostNewestLarge = ({ data }) => {
                     lower: true,
                 })}
                 authorName={data?.user?.fullname}
-                date={formatDate}
+                date={data.createdAt}
             ></PostMeta>
         </PostNewestLargeStyles>
     );
