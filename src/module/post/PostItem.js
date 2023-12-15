@@ -9,6 +9,7 @@ const PostItemStyles = styled.div`
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+
     .post {
         &-image {
             height: 202px;
@@ -16,6 +17,7 @@ const PostItemStyles = styled.div`
             display: block;
             width: 100%;
             border-radius: 16px;
+            border: 1px solid #b3b3b3;
         }
         &-category {
             margin-bottom: 10px;

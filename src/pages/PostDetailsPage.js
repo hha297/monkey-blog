@@ -8,7 +8,7 @@ import parse from 'html-react-parser';
 import PageNotFound from './PageNotFound';
 import Layout from 'components/layout/Layout';
 import AuthorBox from 'components/author/AuthorBox';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { db } from 'firebase-app/firebase-config';
 import {
     collection,
@@ -16,6 +16,8 @@ import {
     query,
     where,
 } from 'firebase/firestore';
+import { useAuth } from 'contexts/auth-context';
+import { userRole } from 'utils/constants';
 const PostDetailsPageStyles = styled.div`
     padding-bottom: 100px;
     .post {
@@ -115,7 +117,11 @@ const PostDetailsPage = () => {
             );
             onSnapshot(colRef, (snapshot) => {
                 snapshot.forEach((doc) => {
-                    doc.data() && setPostInfo(doc.data());
+                    doc.data() &&
+                        setPostInfo({
+                            id: doc.id,
+                            ...doc.data(),
+                        });
                 });
             });
         }
@@ -127,9 +133,11 @@ const PostDetailsPage = () => {
             block: 'start',
         });
     }, [slug]);
+    const { userInfo } = useAuth();
     if (!slug) return <PageNotFound></PageNotFound>;
     if (!postInfo.title) return null;
     const { user } = postInfo;
+    console.log('PostDetailsPage ~ postInfo', postInfo);
     return (
         <PostDetailsPageStyles>
             <Layout>
@@ -155,6 +163,16 @@ const PostDetailsPage = () => {
                                     postInfo.user.username
                                 }
                             ></PostMeta>
+                            {/* Check if user role is ADMIN then can edit the post */}
+                            {userInfo.role ===
+                                userRole.ADMIN && (
+                                <Link
+                                    to={`/manage/update-post?id=${postInfo.id}`}
+                                    className="mt-5 inline-block py-2 px-4 border border-primary text-white font-semibold bg-primary rounded-md text-sm"
+                                >
+                                    Edit post
+                                </Link>
+                            )}
                         </div>
                     </div>
                     <div className="post-content">
