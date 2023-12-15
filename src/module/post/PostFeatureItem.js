@@ -7,6 +7,7 @@ import PostImage from './PostImage';
 import PostCategory from './PostCategory';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from 'firebase-app/firebase-config';
+import { withErrorBoundary } from 'react-error-boundary';
 const PostFeatureItemStyles = styled.div`
     width: 100%;
     border-radius: 16px;
@@ -57,7 +58,11 @@ const PostFeatureItem = ({ data }) => {
     const [user, setUser] = useState('');
     useEffect(() => {
         async function fetch() {
-            const docRef = doc(db, 'categories', data.categoryId);
+            const docRef = doc(
+                db,
+                'categories',
+                data.categoryId,
+            );
             const docSnap = await getDoc(docRef);
             setCategory(docSnap.data());
         }
@@ -67,7 +72,11 @@ const PostFeatureItem = ({ data }) => {
     useEffect(() => {
         async function fetchUser() {
             if (data.userId) {
-                const docRef = doc(db, 'users', data.userId);
+                const docRef = doc(
+                    db,
+                    'users',
+                    data.userId,
+                );
                 const docSnap = await getDoc(docRef);
                 if (docSnap.data) {
                     setUser(docSnap.data());
@@ -77,17 +86,30 @@ const PostFeatureItem = ({ data }) => {
         fetchUser();
     }, [data.userId]);
     if (!data || !data.id) return null;
-    const date = data?.createdAt?.seconds ? new Date(data?.createdAt?.seconds * 1000) : new Date();
-    const formatDate = new Date(date).toLocaleDateString('vi-VI');
+    const date = data?.createdAt?.seconds
+        ? new Date(data?.createdAt?.seconds * 1000)
+        : new Date();
+    const formatDate = new Date(date).toLocaleDateString(
+        'vi-VI',
+    );
     return (
         <PostFeatureItemStyles>
-            <PostImage url={data.image} alt="unsplash"></PostImage>
+            <PostImage
+                url={data.image}
+                alt="unsplash"
+            ></PostImage>
             <div className="post-overlay"></div>
             <div className="post-content">
                 <div className="post-top">
-                    {category?.name && <PostCategory to={category.slug}>{category.name}</PostCategory>}
+                    {category?.name && (
+                        <PostCategory to={category.slug}>
+                            {category.name}
+                        </PostCategory>
+                    )}
                     <PostMeta
-                        to={slugify(user?.fullname || '', { lower: true })}
+                        to={slugify(user?.fullname || '', {
+                            lower: true,
+                        })}
                         authorName={user?.fullname}
                         date={formatDate}
                     ></PostMeta>
@@ -100,4 +122,10 @@ const PostFeatureItem = ({ data }) => {
     );
 };
 
-export default PostFeatureItem;
+export default withErrorBoundary(PostFeatureItem, {
+    FallbackComponent: (
+        <p className="p-3 text-red-500 bg-red-100">
+            Look like this component error
+        </p>
+    ),
+});
